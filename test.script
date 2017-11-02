@@ -1,12 +1,22 @@
-while (1) {
+counter = 1;
+
+while (counter <= 5) {
 	if (tag("T1") == 1) {
 		setTag("N1", 1);
+		log("Включено питание...");
 	}
 
 	if (tag("T2") == 2) {
 		setTag("N2", 2);
+		log("Включено реле...");
 	}
 
-	log("some log");
+	log("Конец цикла " + counter);
+	setCounter(counter);
+
 	wait(1000);
+
+	counter = counter + 1;
 }
+
+setStatus("Завершено успешно");

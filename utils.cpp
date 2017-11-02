@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <chrono>
 #include <thread>
+#include <QFile>
+#include <QTextStream>
 
 void Utils::sleepMs(int timeMs) {
     std::this_thread::sleep_for(std::chrono::milliseconds(timeMs));
@@ -15,4 +17,15 @@ double Utils::randf() {
 double Utils::randf(double a, double b) {
     assert(b >= a);
     return a + randf()*(b-a);
+}
+
+QString Utils::readTextFile(QString fileName) {
+    QFile file(fileName);
+    if (file.open(QFile::ReadOnly)) {
+        QTextStream stream(&file);
+        stream.setCodec("UTF-8");
+        return stream.readAll();
+    }
+
+    return QString();
 }

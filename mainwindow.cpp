@@ -3,59 +3,24 @@
 #include "utils.h"
 #include "script.h"
 
+#ifdef ARM
+#define SCRIPT_FILE "/opt/test.script"
+#else
+#define SCRIPT_FILE "test.script"
+#endif
+
 using namespace Utils;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    counter(0) {
+    ui(new Ui::MainWindow) {
 
     ui->setupUi(this);
 
-    connect(ui->pbCount, &QPushButton::clicked, this, [this](){
-//        ui->pbCount->setText(QString("Счетчик: %1").arg(++counter));
-
-        QFile file("test.script");
-        if (!file.open(QFile::ReadOnly)) {
-            qDebug("script file not opened");
-            return;
-        }
-
-        QTextStream stream(&file);
-
-        QString scriptText = stream.readAll();
-
-        // запустим управляющий поток для выполнения программы
-        QThread *thread_ = new QThread;
-        connect(thread_, &QThread::started, [thread_, scriptText](){
-
-            Script script;
-            script.setText(scriptText);
-            script.start();
-
-            thread_->deleteLater();
-        });
-        thread_->start();
-    });
-
-
-//    while (1) {
-//        if (tag("T1") == 1) {
-//            setTag("N1", 1);
-//        }
-
-//        if (tag("T2") == 2) {
-//            setTag("N2", 2);
-//        }
-
-//        log("some log");
-//        wait(1000);
+//    // logs
+//    for (int i = 0; i < 100; i++) {
+//        ui->teLog->append(QString("Log: %1").arg(i));
 //    }
-
-    // logs
-    for (int i = 0; i < 100; i++) {
-        ui->teLog->append(QString("Log: %1").arg(i));
-    }
 
     // tags
     QTableWidget *tagsTable = ui->twTags;
@@ -113,15 +78,81 @@ MainWindow::MainWindow(QWidget *parent) :
         bytes.append(0xFF);
         bytes.append(0xEE);
 
-        udp.writeDatagram(bytes.data(), bytes.size(), QHostAddress("192.168.1.8"), 1121);
+        _udp.writeDatagram(bytes.data(), bytes.size(), QHostAddress("192.168.1.8"), 1121);
 
     });
     timer->setInterval(1000);
     timer->start();
 
     // qscript
+    _script.setActionHandler(this);
+    connect(ui->pbCount, &QPushButton::clicked, this, [this](){
+        if (_script.isExecuting()) {
+            return;
+        }
+
+        ui->teLog->clear();
+
+        _script.setText(Utils::readTextFile(SCRIPT_FILE));
+        _script.execute();
+    });
+    connect(ui->pbAbort, &QPushButton::clicked, this, [this](){
+        _script.abortExecuting();
+    });
+
+    connect(this, &MainWindow::displayLog, this, [this](QString log){
+        ui->teLog->append(log);
+    });
+    connect(this, &MainWindow::displayCounter, this, [this](int counter){
+        ui->lCounter->setText(QString::number(counter));
+    });
+    connect(this, &MainWindow::displayStatus, this, [this](QString status){
+        ui->lStatus->setText(status);
+    });
 }
 
 MainWindow::~MainWindow() {
     delete ui;
+}
+
+int MainWindow::tag(QString name) {
+    qDebug("script: %s(%s)", SCRIPT_ACTION_GET_TAG, name.toStdString().c_str());
+
+    if (name == "T1") {
+        return 1;
+
+    } else if (name == "T2") {
+        return 2;
+
+    } else {
+        return 0;
+    }
+}
+
+void MainWindow::setTag(QString name, int value) {
+    qDebug("script: %s(%s,%d)", SCRIPT_ACTION_SET_TAG, name.toStdString().c_str(), value);
+}
+
+void MainWindow::log(QString log) {
+    qDebug("script: %s(%s)", SCRIPT_ACTION_LOG, log.toStdString().c_str());
+
+    displayLog(log);
+}
+
+void MainWindow::wait(int timeMs) {
+    qDebug("script: %s(%d)", SCRIPT_ACTION_WAIT, timeMs);
+
+    Utils::sleepMs(timeMs);
+}
+
+void MainWindow::setCounter(int counter) {
+    qDebug("script: %s(%d)", SCRIPT_ACTION_SET_COUNTER, counter);
+
+    displayCounter(counter);
+}
+
+void MainWindow::setStatus(QString status) {
+    qDebug("script: %s(%s)", SCRIPT_ACTION_SET_STATUS, status.toStdString().c_str());
+
+    displayStatus(status);
 }

@@ -28,4 +28,6 @@ FORMS += \
 contains(PLATFORM, arm) {
     INSTALLS += target
         target.path += /opt
+
+    DEFINES += ARM
 }
