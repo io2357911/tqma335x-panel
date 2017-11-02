@@ -3,18 +3,24 @@ include(build.pri)
 
 DEFINES += QT_NO_PRINTER
 
-QT += core gui network
+QT += core gui network script
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = counter
+CONFIG += c++11
+
+TARGET = panel
 
 HEADERS += \
     mainwindow.h \
-    qcustomplot.h
+    qcustomplot.h \
+    script.h \
+    utils.h
 
 SOURCES += main.cpp \
     mainwindow.cpp \
-    qcustomplot.cpp
+    qcustomplot.cpp \
+    script.cpp \
+    utils.cpp
 
 FORMS += \
     mainwindow.ui

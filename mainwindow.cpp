@@ -1,16 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "utils.h"
+#include "script.h"
 
-#include <assert.h>
-
-double randf() {
-    return rand() / (RAND_MAX + 1.);
-}
-
-double randf(double a, double b) {
-    assert(b >= a);
-    return a + randf()*(b-a);
-}
+using namespace Utils;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -20,8 +13,44 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->pbCount, &QPushButton::clicked, this, [this](){
-        ui->pbCount->setText(QString("Счетчик: %1").arg(++counter));
+//        ui->pbCount->setText(QString("Счетчик: %1").arg(++counter));
+
+        QFile file("test.script");
+        if (!file.open(QFile::ReadOnly)) {
+            qDebug("script file not opened");
+            return;
+        }
+
+        QTextStream stream(&file);
+
+        QString scriptText = stream.readAll();
+
+        // запустим управляющий поток для выполнения программы
+        QThread *thread_ = new QThread;
+        connect(thread_, &QThread::started, [thread_, scriptText](){
+
+            Script script;
+            script.setText(scriptText);
+            script.start();
+
+            thread_->deleteLater();
+        });
+        thread_->start();
     });
+
+
+//    while (1) {
+//        if (tag("T1") == 1) {
+//            setTag("N1", 1);
+//        }
+
+//        if (tag("T2") == 2) {
+//            setTag("N2", 2);
+//        }
+
+//        log("some log");
+//        wait(1000);
+//    }
 
     // logs
     for (int i = 0; i < 100; i++) {
@@ -89,6 +118,8 @@ MainWindow::MainWindow(QWidget *parent) :
     });
     timer->setInterval(1000);
     timer->start();
+
+    // qscript
 }
 
 MainWindow::~MainWindow() {

@@ -15,9 +15,9 @@ public:
     ~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
-    int counter;
-    QUdpSocket udp;
+    Ui::MainWindow  *ui;
+    int             counter;
+    QUdpSocket      udp;
 };
 
 #endif // MAINWINDOW_H

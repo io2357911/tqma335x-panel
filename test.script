@@ -1,0 +1,12 @@
+while (1) {
+	if (tag("T1") == 1) {
+		setTag("N1", 1);
+	}
+
+	if (tag("T2") == 2) {
+		setTag("N2", 2);
+	}
+
+	log("some log");
+	wait(1000);
+}
