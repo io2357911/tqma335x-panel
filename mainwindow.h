@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QUdpSocket>
 #include "script.h"
+#include "driver.h"
 
 namespace Ui {
 class MainWindow;
@@ -34,7 +34,7 @@ public:
 
 private:
     Ui::MainWindow  *ui;
-    QUdpSocket      _udp;
+    Driver          _driver;
     Script          _script;
 };
 

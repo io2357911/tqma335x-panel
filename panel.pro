@@ -14,13 +14,17 @@ HEADERS += \
     mainwindow.h \
     qcustomplot.h \
     script.h \
-    utils.h
+    utils.h \
+    driver.h \
+    tag.h
 
 SOURCES += main.cpp \
     mainwindow.cpp \
     qcustomplot.cpp \
     script.cpp \
-    utils.cpp
+    utils.cpp \
+    driver.cpp \
+    tag.cpp
 
 FORMS += \
     mainwindow.ui

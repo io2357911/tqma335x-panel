@@ -29,8 +29,8 @@ public:
     virtual ~IScript();
 
     virtual void execute() = 0;
-    virtual bool isExecuting() = 0;
     virtual void abortExecuting() = 0;
+    virtual bool isExecuting() = 0;
 
     QString text() const;
     void setText(const QString &text);
@@ -56,8 +56,8 @@ public:
     // IScript interface
 public:
     void execute();
-    bool isExecuting();
     void abortExecuting();
+    bool isExecuting();
 };
 
 
@@ -73,8 +73,8 @@ public:
     // IScript interface
 public:
     void execute();
-    bool isExecuting();
     void abortExecuting();
+    bool isExecuting();
 
 private:
     QThread     *_thread;

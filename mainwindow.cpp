@@ -17,11 +17,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
 
-//    // logs
-//    for (int i = 0; i < 100; i++) {
-//        ui->teLog->append(QString("Log: %1").arg(i));
-//    }
-
     // tags
     QTableWidget *tagsTable = ui->twTags;
     tagsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -69,22 +64,14 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->setInterval(250);
     timer->start();
 
-    // udp send
-    timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, [this](){
-        QByteArray bytes;
+    // driver
+    _driver.setIp(QHostAddress("192.168.109.30"));
+    _driver.setPort(1122);
+    _driver.setListenPort(1122);
+    _driver.setPollMs(100);
+    _driver.start();
 
-        bytes.append(0xC0);
-        bytes.append(0xFF);
-        bytes.append(0xEE);
-
-        _udp.writeDatagram(bytes.data(), bytes.size(), QHostAddress("192.168.1.8"), 1121);
-
-    });
-    timer->setInterval(1000);
-    timer->start();
-
-    // qscript
+    // script
     _script.setActionHandler(this);
     connect(ui->pbCount, &QPushButton::clicked, this, [this](){
         if (_script.isExecuting()) {

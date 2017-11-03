@@ -134,12 +134,12 @@ void BaseScript::execute() {
     evaluate(_text);
 }
 
-bool BaseScript::isExecuting() {
-    return isEvaluating();
-}
-
 void BaseScript::abortExecuting() {
     abortEvaluation();
+}
+
+bool BaseScript::isExecuting() {
+    return isEvaluating();
 }
 
 
@@ -165,12 +165,12 @@ void Script::execute() {
     _thread->start();
 }
 
-bool Script::isExecuting() {
-    return _thread;
-}
-
 void Script::abortExecuting() {
     if (_script) {
         _script->abortExecuting();
     }
+}
+
+bool Script::isExecuting() {
+    return _thread;
 }
