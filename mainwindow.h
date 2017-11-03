@@ -2,8 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "script.h"
+#include "tag.h"
 #include "driver.h"
+#include "script.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -18,11 +20,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-signals:
-    void displayLog(QString log);
-    void displayCounter(int counter);
-    void displayStatus(QString status);
-
     // IScriptActionHandler interface
 public:
     int tag(QString name);
@@ -32,8 +29,14 @@ public:
     void setCounter(int _counter);
     void setStatus(QString status);
 
+signals:
+    void displayLog(QString log);
+    void displayCounter(int counter);
+    void displayStatus(QString status);
+
 private:
     Ui::MainWindow  *ui;
+    Tags            _tags;
     Driver          _driver;
     Script          _script;
 };

@@ -16,7 +16,8 @@ HEADERS += \
     script.h \
     utils.h \
     driver.h \
-    tag.h
+    tag.h \
+    ini.h
 
 SOURCES += main.cpp \
     mainwindow.cpp \

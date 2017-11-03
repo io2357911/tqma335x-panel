@@ -5,8 +5,10 @@
 
 #ifdef ARM
 #define SCRIPT_FILE "/opt/test.script"
+#define TAGS_FILE   "/opt/tags.efs"
 #else
-#define SCRIPT_FILE "test.script"
+#define SCRIPT_FILE "../../../test.script"
+#define TAGS_FILE   "../../../tags.efs"
 #endif
 
 using namespace Utils;
@@ -18,27 +20,31 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // tags
+    _tags = Tags::load(TAGS_FILE);
+
     QTableWidget *tagsTable = ui->twTags;
     tagsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-    int rowCount = 50;
+    int rowCount = _tags.size();
     tagsTable->setRowCount(rowCount);
     for (int i = 0; i < rowCount; i++) {
+        Tag *tag = _tags[i];
+
         QTableWidgetItem *item;
 
-        item = new QTableWidgetItem(QString("Название %1").arg(i));
+        item = new QTableWidgetItem(tag->name());
         item->setTextAlignment(Qt::AlignCenter);
         tagsTable->setItem(i, 0, item);
 
-        item = new QTableWidgetItem(QString("Устройство %1").arg(i));
+        item = new QTableWidgetItem(tag->device());
         item->setTextAlignment(Qt::AlignCenter);
         tagsTable->setItem(i, 1, item);
 
-        item = new QTableWidgetItem(QString("Тип %1").arg(i));
+        item = new QTableWidgetItem(tag->type());
         item->setTextAlignment(Qt::AlignCenter);
         tagsTable->setItem(i, 2, item);
 
-        item = new QTableWidgetItem(QString("Значение %1").arg(i));
+        item = new QTableWidgetItem(QString::number(tag->value()));
         item->setTextAlignment(Qt::AlignCenter);
         tagsTable->setItem(i, 3, item);
     }
@@ -65,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->start();
 
     // driver
+    _driver.setTags(_tags);
     _driver.setIp(QHostAddress("192.168.109.30"));
     _driver.setPort(1122);
     _driver.setListenPort(1122);
