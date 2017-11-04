@@ -8,9 +8,11 @@
 #ifdef ARM
 #define CONFIG_FILE   "/opt/config.ini"
 #define TAGS_FILE   "/opt/tags.efs"
+#define OUTPUT_FILE "/opt/script.log"
 #else
 #define CONFIG_FILE   "../../../config.ini"
 #define TAGS_FILE   "../../../tags.efs"
+#define OUTPUT_FILE "../../../script.log"
 #endif
 
 using namespace Utils;
@@ -122,7 +124,10 @@ MainWindow::MainWindow(QWidget *parent) :
         script->setParent(this);
         script->setActionHandler(this);
         connect(script, SIGNAL(started()), this, SLOT(updateButtons()));
-        connect(script, SIGNAL(finished()), this, SLOT(updateButtons()));
+        connect(script, &Script::finished, this, [this](){
+            updateButtons();
+            Utils::writeTextFile(OUTPUT_FILE, ui->teLog->toPlainText());
+        });
 
         QPushButton *button = new QPushButton(script->name(), this);
         connect(button, &QPushButton::clicked, this, [this, script]() {

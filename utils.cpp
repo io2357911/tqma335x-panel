@@ -30,6 +30,16 @@ QString Utils::readTextFile(QString fileName, QString codec) {
     return QString();
 }
 
+void Utils::writeTextFile(QString fileName, QString text, QString codec) {
+    QFile file(fileName);
+    if (file.open(QFile::WriteOnly)) {
+        QTextStream stream(&file);
+        stream.setCodec(codec.toStdString().c_str());
+
+        stream << text;
+    }
+}
+
 int Utils::getInt(uint8_t *data, uint dataSize, uint bitOffset, uint bitSize) {
     int64_t value = 0;
     if (bitSize == 0 || bitSize >= 32) return value;
