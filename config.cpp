@@ -21,10 +21,11 @@ Config Config::load(QString fileName) {
 
     // common
 
-    keys = QStringList({ "tagsRefreshMs" });
+    keys = QStringList({ "tagsRefreshMs", "checkDevices" });
     settings = INI::restore(keys, fileName, "Common");
 
     config.setCommonTagsRefreshMs(settings.integer("tagsRefreshMs", config.commonTagsRefreshMs()));
+    config.setCheckDevices(settings.integer("checkDevices", config.checkDevices()));
 
     // scripts
 
@@ -107,6 +108,16 @@ Scripts Config::scripts() const
 void Config::setScripts(const Scripts &scripts)
 {
     _scripts = scripts;
+}
+
+bool Config::checkDevices() const
+{
+    return _checkDevices;
+}
+
+void Config::setCheckDevices(bool checkDevices)
+{
+    _checkDevices = checkDevices;
 }
 
 int Config::driverSendCount() const

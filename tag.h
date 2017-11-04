@@ -1,12 +1,14 @@
 #ifndef TAG_H
 #define TAG_H
 
+#include <QObject>
 #include <QVector>
 #include <mutex>
 
-class Tag {
+class Tag : public QObject {
+    Q_OBJECT
 public:
-    Tag();
+    Tag(QObject *parent = 0);
 
     QString name() const;
     void setName(const QString &name);
@@ -35,6 +37,9 @@ public:
     int value();
     void setValue(int value);
 
+signals:
+    void valueChanged(int value);
+
 private:
     QString     _name;
     QString     _native;
@@ -53,11 +58,11 @@ class Tags : public QVector<Tag*> {
 public:
     static Tags load(QString fileName);
 
-    Tags();
-
     void update(uint8_t *buffer, uint size);
 
     Tag *find(QString name) const;
+
+    QVector<Tag*> deviceTags() const;
 
     int hardId() const;
     void setHardId(int hardId);

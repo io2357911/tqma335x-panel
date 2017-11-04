@@ -46,7 +46,9 @@ private slots:
     void updateButtons();
 
 private:
+    bool isDevicesReady();
     bool isScriptExecuting();
+    bool abortScriptExecuting();
 
 private:
     Ui::MainWindow  *ui;

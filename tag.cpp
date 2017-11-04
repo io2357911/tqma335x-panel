@@ -1,12 +1,11 @@
 #include "tag.h"
-#include "ini.h"
 #include <algorithm>
-
+#include "ini.h"
 #include "utils.h"
 
-Tag::Tag() {
 
-}
+Tag::Tag(QObject *parent) :
+    QObject(parent) {}
 
 QString Tag::name() const
 {
@@ -94,11 +93,18 @@ int Tag::value()  {
 }
 
 void Tag::setValue(int value) {
+    bool changed = false;
     if (_value != value) {
         std::lock_guard<std::mutex> lock(_valueMutex);
         _value = value;
+        changed = true;
+    }
+
+    if (changed) {
+        emit valueChanged(_value);
     }
 }
+
 
 Tags Tags::load(QString fileName) {
     Tags tags;
@@ -139,8 +145,6 @@ Tags Tags::load(QString fileName) {
     return tags;
 }
 
-Tags::Tags() {}
-
 void Tags::update(uint8_t *buffer, uint size) {
     Q_ASSERT(size >= 1500);
 
@@ -169,6 +173,18 @@ Tag *Tags::find(QString name) const {
         }
     }
     return 0;
+}
+
+QVector<Tag *> Tags::deviceTags() const {
+    QVector<Tag *> tags;
+
+    for (Tag *tag : *this) {
+        if (tag->segment() == 0) {
+            tags.append(tag);
+        }
+    }
+
+    return tags;
 }
 
 int Tags::segmentSizeS() const

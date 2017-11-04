@@ -32,6 +32,9 @@ public:
     int commonTagsRefreshMs() const;
     void setCommonTagsRefreshMs(int commonTagsRefreshMs);
 
+    bool checkDevices() const;
+    void setCheckDevices(bool checkDevices);
+
     // scripts
 
     Scripts scripts() const;
@@ -47,6 +50,7 @@ private:
 
     // common
     int             _commonTagsRefreshMs    = 250;
+    bool            _checkDevices           = 1;
 
     // scripts
     Scripts         _scripts;

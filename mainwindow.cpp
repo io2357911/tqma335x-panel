@@ -3,14 +3,14 @@
 #include "utils.h"
 #include "script.h"
 
+#define DEVICE_READY_VALUE  3
+
 #ifdef ARM
 #define CONFIG_FILE   "/opt/config.ini"
 #define TAGS_FILE   "/opt/tags.efs"
-#define SCRIPT_FILE "/opt/test.script"
 #else
 #define CONFIG_FILE   "../../../config.ini"
 #define TAGS_FILE   "../../../tags.efs"
-#define SCRIPT_FILE "../../../test2.script"
 #endif
 
 using namespace Utils;
@@ -29,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QTableWidget *tagsTable = ui->twTags;
     tagsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
     tagsTable->setRowCount(_tags.size());
     for (int i = 0; i < _tags.size(); i++) {
         Tag *tag = _tags[i];
@@ -61,6 +60,28 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     });
     _tagsRefreshTimer.start();
+
+    // индикация устройств
+    QVector<Tag*> deviceTags = _tags.deviceTags();
+    for (Tag *tag : deviceTags) {
+        QLabel *label = new QLabel(tag->device(), this);
+        label->setStyleSheet("color : red;");
+        ui->hlDevices->insertWidget(ui->hlDevices->count()-1, label);
+
+        connect(tag, &Tag::valueChanged, this, [this, label](int value){
+            if (value == DEVICE_READY_VALUE) {
+                label->setStyleSheet("color : green;");
+
+            } else {
+                label->setStyleSheet("color : red;");
+            }
+
+            if (_config.checkDevices()) {
+                abortScriptExecuting();
+                qDebug("main: device failed - script stopped");
+            }
+        });
+    }
 
     // graph
 
@@ -105,7 +126,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
         QPushButton *button = new QPushButton(script->name(), this);
         connect(button, &QPushButton::clicked, this, [this, script]() {
-            if (isScriptExecuting()) return;
+            if (isScriptExecuting()) {
+                qDebug("main: failed to start script - already running one");
+                return;
+            }
+            if (!isDevicesReady()) {
+                qDebug("main: failed to start script - devices are not ready");
+                return;
+            }
 
             ui->teLog->clear();
             displayStatus(Status_InProgress);
@@ -117,13 +145,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     connect(ui->pbAbort, &QPushButton::clicked, this, [this](){
-        bool executing = false;
-        for (Script *script : _scripts) {
-            if (script->isExecuting()) {
-                script->abortExecuting();
-                executing = true;
-            }
-        }
+        bool executing = abortScriptExecuting();
 
         if (!executing) {
             ui->teLog->clear();
@@ -217,6 +239,18 @@ void MainWindow::updateButtons() {
     }
 }
 
+bool MainWindow::isDevicesReady() {
+    if (!_config.checkDevices()) return true;
+
+    QVector<Tag*> deviceTags = _tags.deviceTags();
+    for (Tag *tag : deviceTags) {
+        if (tag->value() != DEVICE_READY_VALUE) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool MainWindow::isScriptExecuting() {
     for (Script *script : _scripts) {
         if (script->isExecuting()) {
@@ -224,4 +258,15 @@ bool MainWindow::isScriptExecuting() {
         }
     }
     return false;
+}
+
+bool MainWindow::abortScriptExecuting() {
+    bool res = false;
+    for (Script *script : _scripts) {
+        if (script->isExecuting()) {
+            script->abortExecuting();
+            res = true;
+        }
+    }
+    return res;
 }
