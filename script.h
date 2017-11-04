@@ -9,7 +9,7 @@
 #define SCRIPT_ACTION_LOG           "log"
 #define SCRIPT_ACTION_WAIT          "wait"
 #define SCRIPT_ACTION_SET_COUNTER   "setCounter"
-#define SCRIPT_ACTION_SET_STATUS    "setStatus"
+#define SCRIPT_ACTION_FINISH        "finish"
 
 
 class IScriptActionHandler {
@@ -19,7 +19,7 @@ public:
     virtual void log(QString log) = 0;
     virtual void wait(int timeMs) = 0;
     virtual void setCounter(int counter) = 0;
-    virtual void setStatus(QString status) = 0;
+    virtual void finish(int code) = 0;
 };
 
 
@@ -63,7 +63,8 @@ public:
 
 class Script :
     public QObject,
-    public IScript {
+    public IScript,
+    public IScriptActionHandler {
 
     Q_OBJECT
 
@@ -83,10 +84,21 @@ public:
     void abortExecuting();
     bool isExecuting();
 
+    // IScriptActionHandler interface
+public:
+    int tag(QString name);
+    void setTag(QString name, int value);
+    void log(QString log);
+    void wait(int timeMs);
+    void setCounter(int counter);
+    void finish(int code);
+
 private:
     QString     _name;
-    QThread     *_thread;
-    BaseScript  *_script;
+    QThread     *_thread    = 0;
+    BaseScript  *_script    = 0;
+
+    int         _finishCode = -1;
 };
 typedef QVector<Script*> Scripts;
 

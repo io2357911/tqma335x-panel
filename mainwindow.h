@@ -22,6 +22,12 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    enum Status {
+        Status_Ready = -1,
+        Status_InProgress = -2,
+        Status_Ok = 0,
+    };
+
     // IScriptActionHandler interface
 public:
     int tag(QString name);
@@ -29,12 +35,12 @@ public:
     void log(QString log);
     void wait(int timeMs);
     void setCounter(int _counter);
-    void setStatus(QString status);
+    void finish(int code);
 
 signals:
     void displayLog(QString log);
     void displayCounter(int counter);
-    void displayStatus(QString status);
+    void displayStatus(int code);
 
 private slots:
     void updateButtons();

@@ -108,6 +108,7 @@ MainWindow::MainWindow(QWidget *parent) :
             if (isScriptExecuting()) return;
 
             ui->teLog->clear();
+            displayStatus(Status_InProgress);
 
             script->execute();
         });
@@ -126,8 +127,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
         if (!executing) {
             ui->teLog->clear();
+            displayStatus(Status_Ready);
         }
     });
+
+    // misc
 
     connect(this, &MainWindow::displayLog, this, [this](QString log){
         ui->teLog->append(log);
@@ -135,9 +139,26 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, &MainWindow::displayCounter, this, [this](int counter){
         ui->lCounter->setText(QString::number(counter));
     });
-    connect(this, &MainWindow::displayStatus, this, [this](QString status){
-        ui->lStatus->setText(status);
+    connect(this, &MainWindow::displayStatus, this, [this](int code){
+        if (code == Status_Ready) {
+            ui->lStatus->setText("Готовность");
+            ui->lStatus->setStyleSheet("");
+
+        } else if (code == Status_InProgress) {
+            ui->lStatus->setText("Идет проверка");
+            ui->lStatus->setStyleSheet("");
+
+        }  else if (code == Status_Ok) {
+            ui->lStatus->setText("Завершено");
+            ui->lStatus->setStyleSheet("color : green;");
+
+        } else {
+            ui->lStatus->setText("Завершено с ошибкой");
+            ui->lStatus->setStyleSheet("color : red;");
+        }
     });
+
+    displayStatus(Status_Ready);
 }
 
 MainWindow::~MainWindow() {
@@ -145,23 +166,19 @@ MainWindow::~MainWindow() {
 }
 
 int MainWindow::tag(QString name) {
-    qDebug("script: %s(%s)", SCRIPT_ACTION_GET_TAG, name.toStdString().c_str());
-
     Tag *tag = _tags.find(name);
     if (!tag) {
-        qDebug("script: tag('%s') - tag not found", name.toStdString().c_str());
-        return 0;
+        qDebug("main: tag('%s') - tag not found", name.toStdString().c_str());
+        return -1;
     }
 
     return tag->value();
 }
 
 void MainWindow::setTag(QString name, int value) {
-    qDebug("script: %s(%s,%d)", SCRIPT_ACTION_SET_TAG, name.toStdString().c_str(), value);
-
     Tag *tag = _tags.find(name);
     if (!tag) {
-        qDebug("script: setTag('%s') - tag not found", name.toStdString().c_str());
+        qDebug("main: setTag('%s') - tag not found", name.toStdString().c_str());
         return;
     }
 
@@ -169,27 +186,18 @@ void MainWindow::setTag(QString name, int value) {
 }
 
 void MainWindow::log(QString log) {
-    qDebug("script: %s(%s)", SCRIPT_ACTION_LOG, log.toStdString().c_str());
-
     displayLog(log);
 }
 
-void MainWindow::wait(int timeMs) {
-    qDebug("script: %s(%d)", SCRIPT_ACTION_WAIT, timeMs);
-
-    Utils::sleepMs(timeMs);
+void MainWindow::wait(int/* timeMs*/) {
 }
 
 void MainWindow::setCounter(int counter) {
-    qDebug("script: %s(%d)", SCRIPT_ACTION_SET_COUNTER, counter);
-
     displayCounter(counter);
 }
 
-void MainWindow::setStatus(QString status) {
-    qDebug("script: %s(%s)", SCRIPT_ACTION_SET_STATUS, status.toStdString().c_str());
-
-    displayStatus(status);
+void MainWindow::finish(int code) {
+    displayStatus(code);
 }
 
 void MainWindow::updateButtons() {

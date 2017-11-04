@@ -8,18 +8,25 @@ while (1) {
 
 	setTag("Z1OP", 1);
 	log("Установка Z1OP в 1");
-	wait(1000);
+
+	wait(100);
 
 	setTag("Z1OP", 0);
 	log("Установка Z1OP в 0");
 
-	log("Конец цикла " + counter);
-	setCounter(counter);
+	if (counter > 10) {
+		log("Обнаружено зацикливание");
+		finish(1);
+	}
 
 	wait(1000);
+
+	setCounter(counter);
+	
+	log("Конец цикла " + counter);
 
 	counter = counter + 1;
 }
 
 log("Испытание завершено");
-setStatus("Завершено успешно");
+finish(0);
