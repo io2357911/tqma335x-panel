@@ -29,3 +29,20 @@ QString Utils::readTextFile(QString fileName, QString codec) {
 
     return QString();
 }
+
+int Utils::getInt(uint8_t *data, uint dataSize, uint bitOffset, uint bitSize) {
+    int64_t value = 0;
+    if (bitSize == 0 || bitSize >= 32) return value;
+
+    uint byteOffset = bitOffset/8;
+    uint bytesAffected = bitSize/8 + 1;
+    if (byteOffset + bytesAffected > dataSize) return value;
+
+    memcpy((char*)&value, data + byteOffset, bytesAffected);
+
+    int alignOffset = bitOffset - byteOffset*8;
+    value = value >> alignOffset;
+    value &= 0xFFFFFFFF >> (32-bitSize);
+
+    return value;
+}

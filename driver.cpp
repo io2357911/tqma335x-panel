@@ -1,5 +1,7 @@
 #include "driver.h"
 
+#include "mainwindow.h"
+
 Driver::Driver(QObject *parent) :
     QObject(parent), _thread(0), _ip("127.0.0.1"), _port(1122), _udp(0), _listenPort(1122) {
 
@@ -30,20 +32,7 @@ void Driver::start() {
                 memset(buffer, 0, sizeof(buffer));
                 _udp->readDatagram((char*)buffer, sizeof(buffer));
 
-                // проверим magic
-                bool magicOk = (buffer[0] == 0x15) && (buffer[1] == 0xA1) && (buffer[4] == (24|0x80));
-                if (!magicOk) return;
-
-                // проверим hardId
-                int hardId;
-                memcpy((void *)&hardId, (void *)(buffer+6), 2);
-                if (_tags.hardId() != hardId) return;
-
-                qDebug("magic and hardId - OK");
-
-//                for (Tag *tag : _tags) {
-
-//                }
+                _tags.update(buffer, sizeof(buffer));
             }
         });
 

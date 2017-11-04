@@ -2,6 +2,7 @@
 #define TAG_H
 
 #include <QVector>
+#include <mutex>
 
 class Tag {
 public:
@@ -31,20 +32,21 @@ public:
     QString type() const;
     void setType(const QString &type);
 
-    int value() const;
+    int value();
     void setValue(int value);
 
 private:
-    QString _name;
-    QString _native;
-    int     _offset     = 0;
-    int     _segment    = 0;
-    int     _size       = 0;
-    int     _step       = 0;
-    QString _device;
-    QString _type;
+    QString     _name;
+    QString     _native;
+    int         _offset     = 0;
+    int         _segment    = 0;
+    int         _size       = 1;
+    int         _step       = 0;
+    QString     _device;
+    QString     _type;
 
-    int     _value      = 0;
+    int         _value      = 0;
+    std::mutex  _valueMutex;
 };
 
 class Tags : public QVector<Tag*> {
@@ -52,6 +54,8 @@ public:
     static Tags load(QString fileName);
 
     Tags();
+
+    void update(uint8_t *buffer, uint size);
 
     Tag *find(QString name) const;
 

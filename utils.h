@@ -12,6 +12,8 @@ double randf(double a, double b);
 
 QString readTextFile(QString fileName, QString codec = "UTF-8");
 
+int getInt(uint8_t *data, uint dataSize, uint bitOffset, uint bitSize);
+
 }
 
 #endif // UTILS_H

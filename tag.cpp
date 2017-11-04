@@ -2,6 +2,8 @@
 #include "ini.h"
 #include <algorithm>
 
+#include "utils.h"
+
 Tag::Tag() {
 
 }
@@ -86,17 +88,17 @@ void Tag::setType(const QString &type)
     _type = type;
 }
 
-int Tag::value() const
-{
+int Tag::value()  {
+    std::lock_guard<std::mutex> lock(_valueMutex);
     return _value;
 }
 
-void Tag::setValue(int value)
-{
-    _value = value;
+void Tag::setValue(int value) {
+    if (_value != value) {
+        std::lock_guard<std::mutex> lock(_valueMutex);
+        _value = value;
+    }
 }
-
-#include <QTextCodec>
 
 Tags Tags::load(QString fileName) {
     Tags tags;
@@ -106,13 +108,13 @@ Tags Tags::load(QString fileName) {
 
     keys = QStringList({ "HardID" });
     settings = INI::restore(keys, fileName, "Meta");
-    tags.setHardId(settings.value("HardID", 0).toInt());
+    tags.setHardId(settings.integer("HardID", 0));
 
     keys = QStringList({ "SegS", "SegI", "SegQ" });
     settings = INI::restore(keys, fileName, "Segments");
-    tags.setSegmentSizeS(settings.value("SegS", 0).toInt());
-    tags.setSegmentSizeI(settings.value("SegI", 0).toInt());
-    tags.setSegmentSizeQ(settings.value("SegQ", 0).toInt());
+    tags.setSegmentSizeS(settings.integer("SegS"));
+    tags.setSegmentSizeI(settings.integer("SegI"));
+    tags.setSegmentSizeQ(settings.integer("SegQ"));
 
     QStringList groups = INI::groups(fileName, "Tag");
 
@@ -122,14 +124,14 @@ Tags Tags::load(QString fileName) {
 
         Tag *tag = new Tag();
 
-        tag->setName(settings["Name"].toString());
-        tag->setNative(settings["Native"].toString());
-        tag->setOffset(settings.value("Offset", 0).toInt());
-        tag->setSegment(settings.value("Segment", 0).toInt());
-        tag->setSize(settings.value("Size", 0).toInt());
-        tag->setStep(settings.value("Step", 0).toInt());
-        tag->setDevice(settings["Device"].toString());
-        tag->setType(settings["Type"].toString());
+        tag->setName(settings.string("Name"));
+        tag->setNative(settings.string("Native"));
+        tag->setOffset(settings.integer("Offset"));
+        tag->setSegment(settings.integer("Segment"));
+        tag->setSize(settings.integer("Size", 1));
+        tag->setStep(settings.integer("Step", 0));
+        tag->setDevice(settings.string("Device"));
+        tag->setType(settings.string("Type"));
 
         tags.append(tag);
     }
@@ -142,6 +144,27 @@ Tags Tags::load(QString fileName) {
 }
 
 Tags::Tags() {}
+
+void Tags::update(uint8_t *buffer, uint size) {
+    Q_ASSERT(size >= 1500);
+
+    // проверим magic
+    bool magicOk = (buffer[0] == 0x15) && (buffer[1] == 0xA1) && (buffer[4] == (24|0x80));
+    if (!magicOk) return;
+
+    // проверим hardId
+    int hardId = 0;
+    memcpy((void *)&hardId, (void *)(buffer+6), 2);
+    if (_hardId != hardId) return;
+
+    uint8_t *data = buffer + 16;
+
+    for (Tag *tag : *this) {
+        int value = Utils::getInt(data, size-16, tag->offset(), tag->size());
+//        qDebug("tag: offset: %d, size: %d, value: %d", tag->offset(), tag->size(), value);
+        tag->setValue(value);
+    }
+}
 
 Tag *Tags::find(QString name) const {
     for (Tag *tag : *this) {

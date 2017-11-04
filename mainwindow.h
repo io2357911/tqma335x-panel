@@ -42,6 +42,8 @@ private:
     Tags            _tags;
     Driver          _driver;
     Script          _script;
+
+    QTimer          _tagsRefreshTimer;
 };
 
 #endif // MAINWINDOW_H

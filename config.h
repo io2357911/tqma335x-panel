@@ -21,14 +21,18 @@ public:
     int driverPollMs() const;
     void setDriverPollMs(int driverPollMs);
 
-private:
-    // controller
-    QHostAddress    _driverIp           = QHostAddress("127.0.0.1");
-    int             _driverPort         = 1122;
+    int commonTagsRefreshMs() const;
+    void setCommonTagsRefreshMs(int commonTagsRefreshMs);
 
+private:
     // driver
-    int             _driverListenPort   = 1122;
-    int             _driverPollMs       = 100;
+    QHostAddress    _driverIp               = QHostAddress("127.0.0.1");
+    int             _driverPort             = 1122;
+    int             _driverListenPort       = 1122;
+    int             _driverPollMs           = 100;
+
+    // common
+    int             _commonTagsRefreshMs    = 250;
 };
 
 #endif // CONFIG_H

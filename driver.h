@@ -19,7 +19,6 @@ public:
     void getTagsValues();
     void setTagValue(Tag *tag, int value);
 
-
     Tags tags() const;
     void setTags(const Tags &tags);
 

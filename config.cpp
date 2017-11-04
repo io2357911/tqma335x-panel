@@ -11,6 +11,7 @@ Config Config::load(QString fileName) {
     QStringList keys;
     INI::Settings settings;
 
+    // driver
     keys = QStringList({ "ip", "port", "listenPort", "pollMs" });
     settings = INI::restore(keys, fileName, "Driver");
 
@@ -18,6 +19,12 @@ Config Config::load(QString fileName) {
     config.setDriverPort(settings.integer("port", config.driverPort()));
     config.setDriverListenPort(settings.integer("listenPort", config.driverListenPort()));
     config.setDriverPollMs(settings.integer("pollMs", config.driverPollMs()));
+
+    // common
+    keys = QStringList({ "tagsRefreshMs" });
+    settings = INI::restore(keys, fileName, "Common");
+
+    config.setCommonTagsRefreshMs(settings.integer("tagsRefreshMs", config.commonTagsRefreshMs()));
 
     return config;
 }
@@ -60,5 +67,15 @@ int Config::driverPollMs() const
 void Config::setDriverPollMs(int driverPollMs)
 {
     _driverPollMs = driverPollMs;
+}
+
+int Config::commonTagsRefreshMs() const
+{
+    return _commonTagsRefreshMs;
+}
+
+void Config::setCommonTagsRefreshMs(int commonTagsRefreshMs)
+{
+    _commonTagsRefreshMs = commonTagsRefreshMs;
 }
 
