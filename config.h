@@ -6,21 +6,6 @@
 #include "script.h"
 
 
-//class ScriptInfo {
-//public:
-//    QString name() const;
-//    void setName(const QString &name);
-
-//    QString path() const;
-//    void setPath(const QString &path);
-
-//private:
-//    QString _name;
-//    QString _path;
-//};
-//typedef QVector<ScriptInfo> ScriptInfos;
-
-
 class Config {
 public:
     static Config load(QString fileName);

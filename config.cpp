@@ -1,7 +1,6 @@
 #include "config.h"
 
 #include "ini.h"
-#include "utils.h"
 
 Config Config::load(QString fileName) {
     Config config;
@@ -40,7 +39,7 @@ Config Config::load(QString fileName) {
         Script *script = new Script();
 
         script->setName(settings.string("name"));
-        script->setText(Utils::readTextFile(settings.string("path")));
+        script->setPath(settings.string("path"));
 
         scripts.append(script);
     }

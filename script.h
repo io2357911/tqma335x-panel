@@ -74,6 +74,9 @@ public:
     QString name() const;
     void setName(const QString &name);
 
+    QString path() const;
+    void setPath(const QString &path);
+
 signals:
     void started();
     void finished();
@@ -95,6 +98,8 @@ public:
 
 private:
     QString     _name;
+    QString     _path;
+
     QThread     *_thread    = 0;
     BaseScript  *_script    = 0;
 

@@ -152,6 +152,8 @@ void Script::execute() {
 
     _finishCode = -1;
 
+    setText(Utils::readTextFile(_path));
+
     _thread = new QThread;
     connect(_thread, &QThread::started, [this](){
         started();
@@ -225,6 +227,16 @@ void Script::finish(int code) {
     _finishCode = code;
 
     if (_actionHandler) _actionHandler->finish(code);
+}
+
+QString Script::path() const
+{
+    return _path;
+}
+
+void Script::setPath(const QString &path)
+{
+    _path = path;
 }
 
 QString Script::name() const

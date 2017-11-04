@@ -26,3 +26,5 @@ while (counter <= 5) {
 
 	counter = counter + 1;
 }
+
+log("Испытание завершено");
