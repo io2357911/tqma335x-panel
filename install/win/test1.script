@@ -1,0 +1,30 @@
+counter = 1;
+
+while (counter <= 5) {
+	if (tag("H1") == 0) {
+		setTag("H1", 1);
+		log("H1 вкл...");
+
+	} else {
+		setTag("H1", 0);
+		log("H1 выкл...");
+	}
+
+	if (tag("H2") == 0) {
+		setTag("H2", 1);
+		log("H2 вкл...");
+	
+	} else {
+		setTag("H2", 0);
+		log("H2 выкл...");
+	}
+
+	log("Конец цикла " + counter);
+	setCounter(counter);
+
+	wait(1000);
+
+	counter = counter + 1;
+}
+
+log("Испытание завершено");

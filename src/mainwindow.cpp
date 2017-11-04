@@ -6,10 +6,16 @@
 
 #define DEVICE_READY_VALUE  3
 
-#ifdef ARM
+#if defined(ARM)
 #define CONFIG_FILE "/opt/config.ini"
 #define TAGS_FILE   "/opt/tags.efs"
 #define OUTPUT_FILE "/opt/script.log"
+
+#elif defined(BUILD_RELEASE)
+#define CONFIG_FILE "config.ini"
+#define TAGS_FILE   "tags.efs"
+#define OUTPUT_FILE "script.log"
+
 #else
 #define CONFIG_FILE "../../../config.ini"
 #define TAGS_FILE   "../../../tags.efs"
