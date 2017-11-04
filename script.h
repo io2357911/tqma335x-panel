@@ -70,6 +70,13 @@ class Script :
 public:
     Script(QObject *parent = 0);
 
+    QString name() const;
+    void setName(const QString &name);
+
+signals:
+    void started();
+    void finished();
+
     // IScript interface
 public:
     void execute();
@@ -77,8 +84,11 @@ public:
     bool isExecuting();
 
 private:
+    QString     _name;
     QThread     *_thread;
     BaseScript  *_script;
 };
+typedef QVector<Script*> Scripts;
+
 
 #endif // SCRIPT_H

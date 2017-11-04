@@ -14,6 +14,8 @@
 #include <QDateTimeEdit>
 #include <QLineEdit>
 
+#include <QCollator>
+
 #define DEFAULT_INI_FILE    "config.ini"
 #define DEFAULT_GROUP       "allWidgets"
 
@@ -100,6 +102,13 @@ namespace INI {
         QStringList res;
 
         QStringList groups = QSettings(file, QSettings::IniFormat).childGroups();
+
+        QCollator collator;
+        collator.setNumericMode(true);
+        std::sort(groups.begin(), groups.end(),
+              [&collator](const QString &a, const QString &b) -> bool { return collator.compare(a, b) < 0; }
+        );
+
         if (prefix.isEmpty()) return groups;
 
         foreach (QString group, groups) {

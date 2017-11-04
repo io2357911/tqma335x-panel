@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QPushButton>
 #include "config.h"
 #include "tag.h"
 #include "driver.h"
@@ -35,13 +36,20 @@ signals:
     void displayCounter(int counter);
     void displayStatus(QString status);
 
+private slots:
+    void updateButtons();
+
+private:
+    bool isScriptExecuting();
+
 private:
     Ui::MainWindow  *ui;
+    QVector<QPushButton*> _scriptsButton;
 
     Config          _config;
     Tags            _tags;
     Driver          _driver;
-    Script          _script;
+    Scripts         _scripts;
 
     QTimer          _tagsRefreshTimer;
 };

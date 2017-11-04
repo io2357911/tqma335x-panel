@@ -2,11 +2,27 @@
 #define CONFIG_H
 
 #include <QHostAddress>
+#include <QVector>
+#include "script.h"
+
+
+//class ScriptInfo {
+//public:
+//    QString name() const;
+//    void setName(const QString &name);
+
+//    QString path() const;
+//    void setPath(const QString &path);
+
+//private:
+//    QString _name;
+//    QString _path;
+//};
+//typedef QVector<ScriptInfo> ScriptInfos;
+
 
 class Config {
 public:
-    Config();
-
     static Config load(QString fileName);
 
     // driver
@@ -31,6 +47,11 @@ public:
     int commonTagsRefreshMs() const;
     void setCommonTagsRefreshMs(int commonTagsRefreshMs);
 
+    // scripts
+
+    Scripts scripts() const;
+    void setScripts(const Scripts &scripts);
+
 private:
     // driver
     QHostAddress    _driverIp               = QHostAddress("127.0.0.1");
@@ -41,6 +62,9 @@ private:
 
     // common
     int             _commonTagsRefreshMs    = 250;
+
+    // scripts
+    Scripts         _scripts;
 };
 
 #endif // CONFIG_H

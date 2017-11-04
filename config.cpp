@@ -1,9 +1,7 @@
 #include "config.h"
 
 #include "ini.h"
-
-Config::Config() {
-}
+#include "utils.h"
 
 Config Config::load(QString fileName) {
     Config config;
@@ -12,6 +10,7 @@ Config Config::load(QString fileName) {
     INI::Settings settings;
 
     // driver
+
     keys = QStringList({ "ip", "port", "listenPort", "pollMs", "sendCount" });
     settings = INI::restore(keys, fileName, "Driver");
 
@@ -22,10 +21,31 @@ Config Config::load(QString fileName) {
     config.setDriverSendCount(settings.integer("sendCount", config.driverSendCount()));
 
     // common
+
     keys = QStringList({ "tagsRefreshMs" });
     settings = INI::restore(keys, fileName, "Common");
 
     config.setCommonTagsRefreshMs(settings.integer("tagsRefreshMs", config.commonTagsRefreshMs()));
+
+    // scripts
+
+    Scripts scripts;
+
+    QStringList groups = INI::groups(fileName, "Script");
+    keys = QStringList({ "name", "path" });
+
+    for (QString group : groups) {
+        settings = INI::restore(keys, fileName, group);
+
+        Script *script = new Script();
+
+        script->setName(settings.string("name"));
+        script->setText(Utils::readTextFile(settings.string("path")));
+
+        scripts.append(script);
+    }
+
+    config.setScripts(scripts);
 
     return config;
 }
@@ -78,6 +98,16 @@ int Config::commonTagsRefreshMs() const
 void Config::setCommonTagsRefreshMs(int commonTagsRefreshMs)
 {
     _commonTagsRefreshMs = commonTagsRefreshMs;
+}
+
+Scripts Config::scripts() const
+{
+    return _scripts;
+}
+
+void Config::setScripts(const Scripts &scripts)
+{
+    _scripts = scripts;
 }
 
 int Config::driverSendCount() const

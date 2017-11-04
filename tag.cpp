@@ -136,10 +136,6 @@ Tags Tags::load(QString fileName) {
         tags.append(tag);
     }
 
-    std::sort(tags.begin(), tags.end(),
-          [](const Tag* a, const Tag* b) -> bool { return a->offset() < b->offset(); }
-    );
-
     return tags;
 }
 

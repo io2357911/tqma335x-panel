@@ -152,6 +152,8 @@ void Script::execute() {
 
     _thread = new QThread;
     connect(_thread, &QThread::started, [this](){
+        started();
+
         _script = new BaseScript;
         _script->setText(text());
         _script->setActionHandler(actionHandler());
@@ -160,6 +162,8 @@ void Script::execute() {
         _script->deleteLater();
         _script = 0;
         _thread = 0;
+
+        finished();
     });
     connect(_thread, SIGNAL(finished()), _thread, SLOT(deleteLater()));
     _thread->start();
@@ -173,4 +177,14 @@ void Script::abortExecuting() {
 
 bool Script::isExecuting() {
     return _thread;
+}
+
+QString Script::name() const
+{
+    return _name;
+}
+
+void Script::setName(const QString &name)
+{
+    _name = name;
 }

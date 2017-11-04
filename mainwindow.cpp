@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _config = Config::load(CONFIG_FILE);
 
     // tags
+
     _tags = Tags::load(TAGS_FILE);
 
     QTableWidget *tagsTable = ui->twTags;
@@ -62,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _tagsRefreshTimer.start();
 
     // graph
+
     QCustomPlot *plot = ui->wPlot;
     plot->addGraph();
 
@@ -83,6 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->start();
 
     // driver
+
     _driver.setTags(_tags);
     _driver.setIp(_config.driverIp());
     _driver.setPort(_config.driverPort());
@@ -91,20 +94,39 @@ MainWindow::MainWindow(QWidget *parent) :
     _driver.setSendCount(_config.driverSendCount());
     _driver.start();
 
-    // script
-    _script.setActionHandler(this);
-    connect(ui->pbCount, &QPushButton::clicked, this, [this](){
-        if (_script.isExecuting()) {
-            return;
+    // scripts
+
+    _scripts = _config.scripts();
+    for (Script *script : _scripts) {
+        script->setParent(this);
+        script->setActionHandler(this);
+        connect(script, SIGNAL(started()), this, SLOT(updateButtons()));
+        connect(script, SIGNAL(finished()), this, SLOT(updateButtons()));
+
+        QPushButton *button = new QPushButton(script->name(), this);
+        connect(button, &QPushButton::clicked, this, [this, script]() {
+            if (isScriptExecuting()) return;
+
+            ui->teLog->clear();
+
+            script->execute();
+        });
+        ui->hlScripts->insertWidget(ui->hlScripts->count()-2, button);
+        _scriptsButton.append(button);
+    }
+
+    connect(ui->pbAbort, &QPushButton::clicked, this, [this](){
+        bool executing = false;
+        for (Script *script : _scripts) {
+            if (script->isExecuting()) {
+                script->abortExecuting();
+                executing = true;
+            }
         }
 
-        ui->teLog->clear();
-
-        _script.setText(Utils::readTextFile(SCRIPT_FILE));
-        _script.execute();
-    });
-    connect(ui->pbAbort, &QPushButton::clicked, this, [this](){
-        _script.abortExecuting();
+        if (!executing) {
+            ui->teLog->clear();
+        }
     });
 
     connect(this, &MainWindow::displayLog, this, [this](QString log){
@@ -168,4 +190,30 @@ void MainWindow::setStatus(QString status) {
     qDebug("script: %s(%s)", SCRIPT_ACTION_SET_STATUS, status.toStdString().c_str());
 
     displayStatus(status);
+}
+
+void MainWindow::updateButtons() {
+    if (isScriptExecuting()) {
+        for (int i = 0; i < _scripts.size(); i++) {
+            _scriptsButton[i]->setEnabled(_scripts[i]->isExecuting());
+        }
+
+        ui->pbAbort->setText("Прервать");
+
+    } else {
+        for (int i = 0; i < _scripts.size(); i++) {
+            _scriptsButton[i]->setEnabled(true);
+        }
+
+        ui->pbAbort->setText("Сброс");
+    }
+}
+
+bool MainWindow::isScriptExecuting() {
+    for (Script *script : _scripts) {
+        if (script->isExecuting()) {
+            return true;
+        }
+    }
+    return false;
 }

@@ -1,14 +1,22 @@
 counter = 1;
 
 while (counter <= 5) {
-	if (tag("T1") == 1) {
-		setTag("N1", 1);
-		log("Включено питание...");
+	if (tag("H1") == 0) {
+		setTag("H1", 1);
+		log("H1 вкл...");
+
+	} else {
+		setTag("H1", 0);
+		log("H1 выкл...");
 	}
 
-	if (tag("T2") == 2) {
-		setTag("N2", 2);
-		log("Включено реле...");
+	if (tag("H2") == 0) {
+		setTag("H2", 1);
+		log("H2 вкл...");
+	
+	} else {
+		setTag("H2", 0);
+		log("H2 выкл...");
 	}
 
 	log("Конец цикла " + counter);
