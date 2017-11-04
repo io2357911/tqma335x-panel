@@ -5,13 +5,15 @@
 Config Config::load(QString fileName) {
     Config config;
 
+    QString encoding = "UTF-8";
+
     QStringList keys;
-    INI::Settings settings;
+    Ini::Settings settings;
 
     // driver
 
     keys = QStringList({ "ip", "port", "listenPort", "pollMs", "sendCount" });
-    settings = INI::restore(keys, fileName, "Driver");
+    settings = Ini::restore(keys, fileName, "Driver", encoding);
 
     config.setDriverIp(QHostAddress(settings.string("ip", config.driverIp().toString())));
     config.setDriverPort(settings.integer("port", config.driverPort()));
@@ -22,7 +24,7 @@ Config Config::load(QString fileName) {
     // common
 
     keys = QStringList({ "tagsRefreshMs", "checkDevices" });
-    settings = INI::restore(keys, fileName, "Common");
+    settings = Ini::restore(keys, fileName, "Common", encoding);
 
     config.setCommonTagsRefreshMs(settings.integer("tagsRefreshMs", config.commonTagsRefreshMs()));
     config.setCheckDevices(settings.integer("checkDevices", config.checkDevices()));
@@ -31,11 +33,11 @@ Config Config::load(QString fileName) {
 
     Scripts scripts;
 
-    QStringList groups = INI::groups(fileName, "Script");
+    QStringList groups = Ini::groups(fileName, "Script", encoding);
     keys = QStringList({ "name", "path" });
 
     for (QString group : groups) {
-        settings = INI::restore(keys, fileName, group);
+        settings = Ini::restore(keys, fileName, group, encoding);
 
         Script *script = new Script();
 

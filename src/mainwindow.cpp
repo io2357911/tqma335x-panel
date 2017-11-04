@@ -6,11 +6,11 @@
 #define DEVICE_READY_VALUE  3
 
 #ifdef ARM
-#define CONFIG_FILE   "/opt/config.ini"
+#define CONFIG_FILE "/opt/config.ini"
 #define TAGS_FILE   "/opt/tags.efs"
 #define OUTPUT_FILE "/opt/script.log"
 #else
-#define CONFIG_FILE   "../../../config.ini"
+#define CONFIG_FILE "../../../config.ini"
 #define TAGS_FILE   "../../../tags.efs"
 #define OUTPUT_FILE "../../../script.log"
 #endif
@@ -41,24 +41,20 @@ MainWindow::MainWindow(QWidget *parent) :
         item->setTextAlignment(Qt::AlignCenter);
         tagsTable->setItem(i, 0, item);
 
-        item = new QTableWidgetItem(tag->device());
+        item = new QTableWidgetItem(QString::number(tag->value()));
         item->setTextAlignment(Qt::AlignCenter);
         tagsTable->setItem(i, 1, item);
 
-        item = new QTableWidgetItem(tag->type());
+        item = new QTableWidgetItem(tag->comment());
         item->setTextAlignment(Qt::AlignCenter);
         tagsTable->setItem(i, 2, item);
-
-        item = new QTableWidgetItem(QString::number(tag->value()));
-        item->setTextAlignment(Qt::AlignCenter);
-        tagsTable->setItem(i, 3, item);
     }
 
     _tagsRefreshTimer.setInterval(_config.commonTagsRefreshMs());
     connect(&_tagsRefreshTimer, &QTimer::timeout, this, [this](){
         for (int i = 0; i < _tags.size(); i++) {
             Tag *tag = _tags[i];
-            ui->twTags->item(i, 3)->setText(QString::number(tag->value()));
+            ui->twTags->item(i, 1)->setText(QString::number(tag->value()));
         }
     });
     _tagsRefreshTimer.start();

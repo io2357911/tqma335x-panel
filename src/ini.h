@@ -19,9 +19,7 @@
 #define DEFAULT_INI_FILE    "config.ini"
 #define DEFAULT_GROUP       "allWidgets"
 
-namespace INI {
-
-//    typedef QMap<QString, QVariant> Settings;
+namespace Ini {
 
     class Settings : public QMap<QString, QVariant> {
     public:
@@ -63,10 +61,12 @@ namespace INI {
     }
 
     __attribute__((unused))
-    static void store(Settings setts, QString file = DEFAULT_INI_FILE, QString group = DEFAULT_GROUP) {
+    static void store(Settings setts, QString file = DEFAULT_INI_FILE,
+                      QString group = DEFAULT_GROUP, QString encoding = "UTF-8") {
         smSetts.acquire();
 
         QSettings settings(file, QSettings::IniFormat);
+        settings.setIniCodec(encoding.toStdString().c_str());
 
         settings.beginGroup(group);
 
@@ -80,10 +80,12 @@ namespace INI {
     }
 
     __attribute__((unused))
-    static Settings restore(QStringList keys, QString file = DEFAULT_INI_FILE, QString group = DEFAULT_GROUP) {
+    static Settings restore(QStringList keys, QString file = DEFAULT_INI_FILE,
+                            QString group = DEFAULT_GROUP, QString encoding = "UTF-8") {
         smSetts.acquire();
 
         QSettings settings(file, QSettings::IniFormat);
+        settings.setIniCodec(encoding.toStdString().c_str());
         settings.beginGroup(group);
 
         Settings setts;
@@ -98,15 +100,18 @@ namespace INI {
     }
 
     __attribute__((unused))
-    static QStringList groups(QString file = DEFAULT_INI_FILE, QString prefix = "") {
+    static QStringList groups(QString file = DEFAULT_INI_FILE, QString prefix = "",
+                              QString encoding = "UTF-8") {
         QStringList res;
 
-        QStringList groups = QSettings(file, QSettings::IniFormat).childGroups();
+        QSettings settings(file, QSettings::IniFormat);
+        settings.setIniCodec(encoding.toStdString().c_str());
+        QStringList groups = settings.childGroups();
 
         QCollator collator;
         collator.setNumericMode(true);
         std::sort(groups.begin(), groups.end(),
-              [&collator](const QString &a, const QString &b) -> bool { return collator.compare(a, b) < 0; }
+            [&collator](const QString &a, const QString &b) -> bool { return collator.compare(a, b) < 0; }
         );
 
         if (prefix.isEmpty()) return groups;
@@ -120,8 +125,10 @@ namespace INI {
     }
 
     __attribute__((unused))
-    static void removeGroup(QString name, QString file = DEFAULT_INI_FILE) {
+    static void removeGroup(QString name, QString file = DEFAULT_INI_FILE,
+                            QString encoding = "UTF-8") {
         QSettings settings(file, QSettings::IniFormat);
+        settings.setIniCodec(encoding.toStdString().c_str());
 
         settings.beginGroup(name);
         settings.remove("");
@@ -129,7 +136,8 @@ namespace INI {
     }
 
     __attribute__((unused))
-    static void store(QWidget *parent, QString file = DEFAULT_INI_FILE, QString group = DEFAULT_GROUP) {
+    static void store(QWidget *parent, QString file = DEFAULT_INI_FILE,
+                      QString group = DEFAULT_GROUP, QString encoding = "UTF-8") {
         QList<QWidget *> widgetsToStore = findWidgetsWithProperty(parent, "Store");
 
         Settings setts;
@@ -166,11 +174,12 @@ namespace INI {
                 setts[wName] = ((QRadioButton*)w)->isChecked();
         }
 
-        INI::store(setts, file, group);
+        Ini::store(setts, file, group, encoding);
     }
 
     __attribute__((unused))
-    static void restore(QWidget *parent, QString file = DEFAULT_INI_FILE, QString group = DEFAULT_GROUP) {
+    static void restore(QWidget *parent, QString file = DEFAULT_INI_FILE,
+                        QString group = DEFAULT_GROUP, QString encoding = "UTF-8") {
         QList<QWidget *> widgetsToStore = findWidgetsWithProperty(parent, "Store");
         QStringList keys;
         for (int i = 0; i < widgetsToStore.size(); i++) {
@@ -181,7 +190,7 @@ namespace INI {
             keys << "geometry";
         }
 
-        Settings setts = INI::restore(keys, file, group);
+        Settings setts = Ini::restore(keys, file, group, encoding);
 
         if (!parent->parent()) {
             if (setts["geometry"].isValid())

@@ -105,28 +105,40 @@ void Tag::setValue(int value) {
     }
 }
 
+QString Tag::comment() const
+{
+    return _comment;
+}
+
+void Tag::setComment(const QString &comment)
+{
+    _comment = comment;
+}
+
 
 Tags Tags::load(QString fileName) {
     Tags tags;
 
+    QString encoding = "Windows-1251";
+
     QStringList keys;
-    INI::Settings settings;
+    Ini::Settings settings;
 
     keys = QStringList({ "HardID" });
-    settings = INI::restore(keys, fileName, "Meta");
+    settings = Ini::restore(keys, fileName, "Meta");
     tags.setHardId(settings.integer("HardID", 0));
 
     keys = QStringList({ "SegS", "SegI", "SegQ" });
-    settings = INI::restore(keys, fileName, "Segments");
+    settings = Ini::restore(keys, fileName, "Segments");
     tags.setSegmentSizeS(settings.integer("SegS"));
     tags.setSegmentSizeI(settings.integer("SegI"));
     tags.setSegmentSizeQ(settings.integer("SegQ"));
 
-    QStringList groups = INI::groups(fileName, "Tag");
+    QStringList groups = Ini::groups(fileName, "Tag", encoding);
 
-    keys = QStringList({ "Name", "Native", "Offset", "Segment", "Size", "Step", "Device", "Type" });
+    keys = QStringList({ "Name", "Native", "Offset", "Segment", "Comment", "Size", "Step", "Device", "Type" });
     for (QString group : groups) {
-        settings = INI::restore(keys, fileName, group);
+        settings = Ini::restore(keys, fileName, group, encoding);
 
         Tag *tag = new Tag();
 
@@ -134,6 +146,7 @@ Tags Tags::load(QString fileName) {
         tag->setNative(settings.string("Native"));
         tag->setOffset(settings.integer("Offset"));
         tag->setSegment(settings.integer("Segment"));
+        tag->setComment(settings.string("Comment"));
         tag->setSize(settings.integer("Size", 1));
         tag->setStep(settings.integer("Step", 0));
         tag->setDevice(settings.string("Device"));

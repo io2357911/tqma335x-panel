@@ -63,7 +63,7 @@
          </widget>
          <widget class="QWidget" name="tab_2">
           <attribute name="title">
-           <string>Параметры</string>
+           <string>Тэги</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_7">
            <item row="0" column="0">
@@ -75,17 +75,12 @@
              </column>
              <column>
               <property name="text">
-               <string>Устройство</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Тип</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
                <string>Значение</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Комментарий</string>
               </property>
              </column>
             </widget>

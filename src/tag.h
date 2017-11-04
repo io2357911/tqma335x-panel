@@ -22,6 +22,9 @@ public:
     int segment() const;
     void setSegment(int segment);
 
+    QString comment() const;
+    void setComment(const QString &comment);
+
     int size() const;
     void setSize(int size);
 
@@ -37,6 +40,7 @@ public:
     int value();
     void setValue(int value);
 
+
 signals:
     void valueChanged(int value);
 
@@ -45,6 +49,7 @@ private:
     QString     _native;
     int         _offset     = 0;
     int         _segment    = 0;
+    QString     _comment;
     int         _size       = 1;
     int         _step       = 0;
     QString     _device;
