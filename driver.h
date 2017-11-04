@@ -17,7 +17,7 @@ public:
     bool isRunning();
 
     void getTagsValues();
-    void setTagValue(Tag *tag, int value);
+    void setTagValue(const Tags &tags, Tag *tag, int value);
 
     Tags tags() const;
     void setTags(const Tags &tags);
@@ -34,15 +34,19 @@ public:
     int pollMs() const;
     void setPollMs(int pollMs);
 
+    int sendCount() const;
+    void setSendCount(int sendCount);
+
 private:
     Tags            _tags;
-    QThread         *_thread;
+    QThread         *_thread        = 0;
 
-    QHostAddress    _ip;
-    int             _port;
+    QHostAddress    _ip             = QHostAddress("127.0.0.1");
+    int             _port           = 1122;
 
-    QUdpSocket      *_udp;
-    int             _listenPort;
+    QUdpSocket      *_udp           = 0;
+    int             _listenPort     = 1122;
+    int             _sendCount      = 3;
     QTimer          _pollTimer;
 };
 

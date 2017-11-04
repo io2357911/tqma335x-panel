@@ -9,6 +9,8 @@ public:
 
     static Config load(QString fileName);
 
+    // driver
+
     QHostAddress driverIp() const;
     void setDriverIp(const QHostAddress &driverIp);
 
@@ -21,6 +23,11 @@ public:
     int driverPollMs() const;
     void setDriverPollMs(int driverPollMs);
 
+    int driverSendCount() const;
+    void setDriverSendCount(int driverSendCount);
+
+    // common
+
     int commonTagsRefreshMs() const;
     void setCommonTagsRefreshMs(int commonTagsRefreshMs);
 
@@ -30,6 +37,7 @@ private:
     int             _driverPort             = 1122;
     int             _driverListenPort       = 1122;
     int             _driverPollMs           = 100;
+    int             _driverSendCount        = 3;
 
     // common
     int             _commonTagsRefreshMs    = 250;

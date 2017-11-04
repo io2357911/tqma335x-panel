@@ -10,7 +10,7 @@
 #else
 #define CONFIG_FILE   "../../../config.ini"
 #define TAGS_FILE   "../../../tags.efs"
-#define SCRIPT_FILE "../../../test.script"
+#define SCRIPT_FILE "../../../test2.script"
 #endif
 
 using namespace Utils;
@@ -88,6 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _driver.setPort(_config.driverPort());
     _driver.setListenPort(_config.driverListenPort());
     _driver.setPollMs(_config.driverPollMs());
+    _driver.setSendCount(_config.driverSendCount());
     _driver.start();
 
     // script
@@ -124,19 +125,25 @@ MainWindow::~MainWindow() {
 int MainWindow::tag(QString name) {
     qDebug("script: %s(%s)", SCRIPT_ACTION_GET_TAG, name.toStdString().c_str());
 
-    if (name == "T1") {
-        return 1;
-
-    } else if (name == "T2") {
-        return 2;
-
-    } else {
+    Tag *tag = _tags.find(name);
+    if (!tag) {
+        qDebug("script: tag('%s') - tag not found", name.toStdString().c_str());
         return 0;
     }
+
+    return tag->value();
 }
 
 void MainWindow::setTag(QString name, int value) {
     qDebug("script: %s(%s,%d)", SCRIPT_ACTION_SET_TAG, name.toStdString().c_str(), value);
+
+    Tag *tag = _tags.find(name);
+    if (!tag) {
+        qDebug("script: setTag('%s') - tag not found", name.toStdString().c_str());
+        return;
+    }
+
+    _driver.setTagValue(_tags, tag, value);
 }
 
 void MainWindow::log(QString log) {

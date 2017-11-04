@@ -12,13 +12,14 @@ Config Config::load(QString fileName) {
     INI::Settings settings;
 
     // driver
-    keys = QStringList({ "ip", "port", "listenPort", "pollMs" });
+    keys = QStringList({ "ip", "port", "listenPort", "pollMs", "sendCount" });
     settings = INI::restore(keys, fileName, "Driver");
 
     config.setDriverIp(QHostAddress(settings.string("ip", config.driverIp().toString())));
     config.setDriverPort(settings.integer("port", config.driverPort()));
     config.setDriverListenPort(settings.integer("listenPort", config.driverListenPort()));
     config.setDriverPollMs(settings.integer("pollMs", config.driverPollMs()));
+    config.setDriverSendCount(settings.integer("sendCount", config.driverSendCount()));
 
     // common
     keys = QStringList({ "tagsRefreshMs" });
@@ -77,5 +78,15 @@ int Config::commonTagsRefreshMs() const
 void Config::setCommonTagsRefreshMs(int commonTagsRefreshMs)
 {
     _commonTagsRefreshMs = commonTagsRefreshMs;
+}
+
+int Config::driverSendCount() const
+{
+    return _driverSendCount;
+}
+
+void Config::setDriverSendCount(int driverSendCount)
+{
+    _driverSendCount = driverSendCount;
 }
 

@@ -3,7 +3,7 @@
 #include "mainwindow.h"
 
 Driver::Driver(QObject *parent) :
-    QObject(parent), _thread(0), _ip("127.0.0.1"), _port(1122), _udp(0), _listenPort(1122) {
+    QObject(parent) {
 
     _pollTimer.setInterval(100);
     connect(&_pollTimer, &QTimer::timeout, this, [this](){
@@ -79,8 +79,32 @@ void Driver::getTagsValues() {
     _udp->writeDatagram((const char*)buffer, sizeof(buffer), _ip, _port);
 }
 
-void Driver::setTagValue(Tag *tag, int value) {
+void Driver::setTagValue(const Tags &tags, Tag *tag, int value) {
 
+    uint8_t buffer[20];
+    memset(buffer, 0, sizeof(buffer));
+
+    buffer[0] = 0x21; // сигнатура запроса
+    buffer[1] = 0xAB;
+    buffer[2] = 0x0;  // произвольный код
+    buffer[3] = 0x0;
+    buffer[4] = 25;  // код команды
+    buffer[5] = 0;
+
+    int sessionKey = 0; // не поддерживается и должен быть 0
+    int hardId = tags.hardId();
+    int offset = tag->offset();
+    int size = tag->size();
+
+    memcpy((void *)(buffer + 5), &sessionKey, 4);
+    memcpy((void *)(buffer + 9), &hardId, 2);
+    memcpy((void *)(buffer + 11), &offset, 2);
+    memcpy((void *)(buffer + 13), &size, 1);
+    memcpy((void *)(buffer + 14), &value, 4);
+
+    for(int i = 0; i < _sendCount; i++) { // для увеличения вероятности доставки телеграммы
+        _udp->writeDatagram((const char*)buffer, sizeof(buffer), _ip, _port);
+    }
 }
 
 Tags Driver::tags() const {
@@ -121,4 +145,14 @@ int Driver::pollMs() const {
 
 void Driver::setPollMs(int pollMs) {
     _pollTimer.setInterval(pollMs);
+}
+
+int Driver::sendCount() const
+{
+    return _sendCount;
+}
+
+void Driver::setSendCount(int sendRepeatCount)
+{
+    _sendCount = sendRepeatCount;
 }
