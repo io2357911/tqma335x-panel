@@ -13,6 +13,7 @@
 
 
 class IScriptActionHandler {
+
 public:
     virtual int tag(QString name) = 0;
     virtual void setTag(QString name, int value) = 0;
@@ -24,6 +25,7 @@ public:
 
 
 class IScript {
+
 public:
     IScript();
     virtual ~IScript();
@@ -47,7 +49,6 @@ protected:
 class BaseScript :
     public QScriptEngine,
     public IScript {
-
     Q_OBJECT
 
 public:
@@ -65,7 +66,6 @@ class Script :
     public QObject,
     public IScript,
     public IScriptActionHandler {
-
     Q_OBJECT
 
 public:

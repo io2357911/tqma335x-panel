@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QMessageBox>
 #include "utils.h"
 #include "script.h"
 
@@ -25,8 +26,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _config = Config::load(CONFIG_FILE);
 
-    // tags
+    initTags();
+    initDriver();
+    initScripts();
+    initGraph();
+    initMisc();
+}
 
+MainWindow::~MainWindow() {
+    delete ui;
+}
+
+void MainWindow::initTags() {
     _tags = Tags::load(TAGS_FILE);
 
     QTableWidget *tagsTable = ui->twTags;
@@ -76,13 +87,68 @@ MainWindow::MainWindow(QWidget *parent) :
                 if (_config.checkDevices() &&
                     abortScriptExecuting()) {
                     qDebug("main: device failed - script stopped");
+                    QMessageBox::warning(this, "Внимание", "Устройство не подключено или неисправно - скрипт остановлен");
                 }
             }
         });
     }
+}
 
-    // graph
+void MainWindow::initDriver() {
+    _driver.setTags(_tags);
+    _driver.setIp(_config.driverIp());
+    _driver.setPort(_config.driverPort());
+    _driver.setListenPort(_config.driverListenPort());
+    _driver.setPollMs(_config.driverPollMs());
+    _driver.setSendCount(_config.driverSendCount());
+    _driver.start();
+}
 
+void MainWindow::initScripts() {
+    _scripts = _config.scripts();
+    for (Script *script : _scripts) {
+        script->setParent(this);
+        script->setActionHandler(this);
+        connect(script, SIGNAL(started()), this, SLOT(updateButtons()));
+        connect(script, &Script::finished, this, [this](){
+            updateButtons();
+            Utils::writeTextFile(OUTPUT_FILE, ui->teLog->toPlainText());
+        });
+
+        QPushButton *button = new QPushButton(script->name(), this);
+        connect(button, &QPushButton::clicked, this, [this, script]() {
+            if (isScriptExecuting()) {
+                qDebug("main: failed to start script - already running one");
+                QMessageBox::warning(this, "Внимание", "Скрипт уже запущен");
+                return;
+            }
+            if (!isDevicesReady()) {
+                qDebug("main: failed to start script - devices are not ready");
+                QMessageBox::warning(this, "Внимание", "Устройство не подключено или неисправно");
+                return;
+            }
+
+            ui->teLog->clear();
+            displayStatus(Status_InProgress);
+            ui->lCounter->setText("0");
+
+            script->execute();
+        });
+        ui->hlScripts->insertWidget(ui->hlScripts->count()-2, button);
+        _scriptsButton.append(button);
+    }
+
+    connect(ui->pbAbort, &QPushButton::clicked, this, [this](){
+        bool executing = abortScriptExecuting();
+
+        if (!executing) {
+            ui->teLog->clear();
+            displayStatus(Status_Ready);
+        }
+    });
+}
+
+void MainWindow::initGraph() {
     QCustomPlot *plot = ui->wPlot;
     plot->addGraph();
 
@@ -102,66 +168,17 @@ MainWindow::MainWindow(QWidget *parent) :
     });
     timer->setInterval(250);
     timer->start();
+}
 
-    // driver
-
-    _driver.setTags(_tags);
-    _driver.setIp(_config.driverIp());
-    _driver.setPort(_config.driverPort());
-    _driver.setListenPort(_config.driverListenPort());
-    _driver.setPollMs(_config.driverPollMs());
-    _driver.setSendCount(_config.driverSendCount());
-    _driver.start();
-
-    // scripts
-
-    _scripts = _config.scripts();
-    for (Script *script : _scripts) {
-        script->setParent(this);
-        script->setActionHandler(this);
-        connect(script, SIGNAL(started()), this, SLOT(updateButtons()));
-        connect(script, &Script::finished, this, [this](){
-            updateButtons();
-            Utils::writeTextFile(OUTPUT_FILE, ui->teLog->toPlainText());
-        });
-
-        QPushButton *button = new QPushButton(script->name(), this);
-        connect(button, &QPushButton::clicked, this, [this, script]() {
-            if (isScriptExecuting()) {
-                qDebug("main: failed to start script - already running one");
-                return;
-            }
-            if (!isDevicesReady()) {
-                qDebug("main: failed to start script - devices are not ready");
-                return;
-            }
-
-            ui->teLog->clear();
-            displayStatus(Status_InProgress);
-
-            script->execute();
-        });
-        ui->hlScripts->insertWidget(ui->hlScripts->count()-2, button);
-        _scriptsButton.append(button);
-    }
-
-    connect(ui->pbAbort, &QPushButton::clicked, this, [this](){
-        bool executing = abortScriptExecuting();
-
-        if (!executing) {
-            ui->teLog->clear();
-            displayStatus(Status_Ready);
-        }
-    });
-
-    // misc
-
+void MainWindow::initMisc() {
     connect(this, &MainWindow::displayLog, this, [this](QString log){
         ui->teLog->append(log);
     });
+
     connect(this, &MainWindow::displayCounter, this, [this](int counter){
         ui->lCounter->setText(QString::number(counter));
     });
+
     connect(this, &MainWindow::displayStatus, this, [this](int code){
         if (code == Status_Ready) {
             ui->lStatus->setText("Готовность");
@@ -180,12 +197,7 @@ MainWindow::MainWindow(QWidget *parent) :
             ui->lStatus->setStyleSheet("color : red;");
         }
     });
-
     displayStatus(Status_Ready);
-}
-
-MainWindow::~MainWindow() {
-    delete ui;
 }
 
 int MainWindow::tag(QString name) {

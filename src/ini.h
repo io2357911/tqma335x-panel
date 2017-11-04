@@ -13,7 +13,6 @@
 #include <QComboBox>
 #include <QDateTimeEdit>
 #include <QLineEdit>
-
 #include <QCollator>
 
 #define DEFAULT_INI_FILE    "config.ini"

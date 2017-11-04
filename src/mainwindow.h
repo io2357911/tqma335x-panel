@@ -8,6 +8,7 @@
 #include "driver.h"
 #include "script.h"
 
+typedef QVector<QPushButton*> Buttons;
 
 namespace Ui {
 class MainWindow;
@@ -16,17 +17,17 @@ class MainWindow;
 class MainWindow :
     public QMainWindow,
     public IScriptActionHandler {
-
     Q_OBJECT
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
 
+public:
     enum Status {
         Status_Ready = -1,
         Status_InProgress = -2,
         Status_Ok = 0,
     };
+
+    explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
 
     // IScriptActionHandler interface
 public:
@@ -46,13 +47,19 @@ private slots:
     void updateButtons();
 
 private:
+    void initTags();
+    void initDriver();
+    void initScripts();
+    void initGraph();
+    void initMisc();
+
     bool isDevicesReady();
     bool isScriptExecuting();
     bool abortScriptExecuting();
 
 private:
     Ui::MainWindow  *ui;
-    QVector<QPushButton*> _scriptsButton;
+    Buttons         _scriptsButton;
 
     Config          _config;
     Tags            _tags;
