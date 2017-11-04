@@ -2,7 +2,7 @@ Makefile
 build/
 tmp/*
 *.pro.user
-*.ini
+#*.ini
 moc_*
 ui_*
 *.o

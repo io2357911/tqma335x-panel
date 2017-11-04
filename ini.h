@@ -19,7 +19,24 @@
 
 namespace INI {
 
-    typedef QMap<QString, QVariant> Settings;
+//    typedef QMap<QString, QVariant> Settings;
+
+    class Settings : public QMap<QString, QVariant> {
+    public:
+        int integer(QString key, int defaultValue = 0) {
+            QVariant value = this->value(key);
+            if (!value.isValid()) return defaultValue;
+
+            bool ok;
+            int val = value.toInt(&ok);
+            return ok ? val : defaultValue;
+        }
+        QString string(QString key, QString defaultValue = QString()) {
+            QVariant value = this->value(key);
+            bool isValid = value.isValid() && value.type() == QVariant::String;
+            return isValid ? value.toString() : defaultValue;
+        }
+    };
 
     static QSemaphore smSetts(1);
 

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "config.h"
 #include "tag.h"
 #include "driver.h"
 #include "script.h"
@@ -36,6 +37,8 @@ signals:
 
 private:
     Ui::MainWindow  *ui;
+
+    Config          _config;
     Tags            _tags;
     Driver          _driver;
     Script          _script;

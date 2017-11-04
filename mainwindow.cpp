@@ -4,11 +4,13 @@
 #include "script.h"
 
 #ifdef ARM
-#define SCRIPT_FILE "/opt/test.script"
+#define CONFIG_FILE   "/opt/config.ini"
 #define TAGS_FILE   "/opt/tags.efs"
+#define SCRIPT_FILE "/opt/test.script"
 #else
-#define SCRIPT_FILE "../../../test.script"
+#define CONFIG_FILE   "../../../config.ini"
 #define TAGS_FILE   "../../../tags.efs"
+#define SCRIPT_FILE "../../../test.script"
 #endif
 
 using namespace Utils;
@@ -18,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow) {
 
     ui->setupUi(this);
+
+    _config = Config::load(CONFIG_FILE);
 
     // tags
     _tags = Tags::load(TAGS_FILE);
@@ -72,10 +76,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // driver
     _driver.setTags(_tags);
-    _driver.setIp(QHostAddress("192.168.109.30"));
-    _driver.setPort(1122);
-    _driver.setListenPort(1122);
-    _driver.setPollMs(100);
+    _driver.setIp(_config.driverIp());
+    _driver.setPort(_config.driverPort());
+    _driver.setListenPort(_config.driverListenPort());
+    _driver.setPollMs(_config.driverPollMs());
     _driver.start();
 
     // script

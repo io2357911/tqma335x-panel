@@ -19,11 +19,11 @@ double Utils::randf(double a, double b) {
     return a + randf()*(b-a);
 }
 
-QString Utils::readTextFile(QString fileName) {
+QString Utils::readTextFile(QString fileName, QString codec) {
     QFile file(fileName);
     if (file.open(QFile::ReadOnly)) {
         QTextStream stream(&file);
-        stream.setCodec("UTF-8");
+        stream.setCodec(codec.toStdString().c_str());
         return stream.readAll();
     }
 

@@ -16,6 +16,9 @@ Driver::~Driver() {
 void Driver::start() {
     if (isRunning()) return;
 
+    qDebug("driver: start(ip: %s, port: %d, listenPort: %d, pollMs: %d)",
+           _ip.toString().toStdString().c_str(), _port, _listenPort, pollMs());
+
     _thread = new QThread;
     connect(_thread, &QThread::started, [this]() {
 
@@ -23,12 +26,24 @@ void Driver::start() {
         _udp->moveToThread(_thread);
         connect(_udp, &QUdpSocket::readyRead, [this]() {
             while (_udp->hasPendingDatagrams()) {
-                QHostAddress ip;
-                QByteArray bytes;
-                bytes.resize(_udp->pendingDatagramSize());
-                _udp->readDatagram(bytes.data(), bytes.size(), &ip);
+                uint8_t buffer[1500];
+                memset(buffer, 0, sizeof(buffer));
+                _udp->readDatagram((char*)buffer, sizeof(buffer));
 
-//                qDebug("udp: got data: size: %d", bytes.size());
+                // проверим magic
+                bool magicOk = (buffer[0] == 0x15) && (buffer[1] == 0xA1) && (buffer[4] == (24|0x80));
+                if (!magicOk) return;
+
+                // проверим hardId
+                int hardId;
+                memcpy((void *)&hardId, (void *)(buffer+6), 2);
+                if (_tags.hardId() != hardId) return;
+
+                qDebug("magic and hardId - OK");
+
+//                for (Tag *tag : _tags) {
+
+//                }
             }
         });
 
@@ -46,6 +61,8 @@ void Driver::start() {
 
 void Driver::stop() {
     if (!isRunning()) return;
+
+    qDebug("driver: stop()");
 
     _pollTimer.stop();
 

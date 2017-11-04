@@ -10,7 +10,7 @@ void sleepMs(int timeMs);
 double randf();
 double randf(double a, double b);
 
-QString readTextFile(QString fileName);
+QString readTextFile(QString fileName, QString codec = "UTF-8");
 
 }
 

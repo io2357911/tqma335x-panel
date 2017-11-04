@@ -17,7 +17,8 @@ HEADERS += \
     utils.h \
     driver.h \
     tag.h \
-    ini.h
+    ini.h \
+    config.h
 
 SOURCES += main.cpp \
     mainwindow.cpp \
@@ -25,7 +26,8 @@ SOURCES += main.cpp \
     script.cpp \
     utils.cpp \
     driver.cpp \
-    tag.cpp
+    tag.cpp \
+    config.cpp
 
 FORMS += \
     mainwindow.ui
