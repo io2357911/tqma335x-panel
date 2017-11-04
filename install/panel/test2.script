@@ -1,0 +1,32 @@
+counter = 1;
+
+while (1) {
+	if (tag("CP") == 1) {
+		log("Условие выхода выполнено");
+		break;
+	}
+
+	setTag("Z1OP", 1);
+	log("Установка Z1OP в 1");
+
+	wait(100);
+
+	setTag("Z1OP", 0);
+	log("Установка Z1OP в 0");
+
+	if (counter > 10) {
+		log("Обнаружено зацикливание");
+		finish(1);
+	}
+
+	wait(1000);
+
+	setCounter(counter);
+	
+	log("Конец цикла " + counter);
+
+	counter = counter + 1;
+}
+
+log("Испытание завершено");
+finish(0);

@@ -74,11 +74,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
             } else {
                 label->setStyleSheet("color : red;");
-            }
 
-            if (_config.checkDevices()) {
-                abortScriptExecuting();
-                qDebug("main: device failed - script stopped");
+                if (_config.checkDevices() &&
+                    abortScriptExecuting()) {
+                    qDebug("main: device failed - script stopped");
+                }
             }
         });
     }

@@ -36,5 +36,14 @@ contains(PLATFORM, arm) {
     INSTALLS += target
         target.path += /opt
 
+    INSTALLS += conf
+        conf.path = /opt
+        conf.files += $$PWD/install/panel/panel.sh
+        conf.files += $$PWD/install/panel/config.ini
+        conf.files += $$PWD/install/panel/tags.efs
+        conf.files += $$PWD/install/panel/test1.script
+        conf.files += $$PWD/install/panel/test2.script
+        conf.files += $$PWD/install/panel/test3.script
+
     DEFINES += ARM
 }
