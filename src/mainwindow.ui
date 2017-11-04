@@ -44,7 +44,6 @@
            </spacer>
           </item>
          </layout>
-         <zorder>horizontalSpacer</zorder>
         </widget>
        </item>
        <item row="1" column="0">
@@ -200,7 +199,7 @@
   <customwidget>
    <class>QCustomPlot</class>
    <extends>QWidget</extends>
-   <header>qcustomplot.h</header>
+   <header>src/qcustomplot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

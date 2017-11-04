@@ -11,26 +11,27 @@ CONFIG += c++11
 TARGET = panel
 
 HEADERS += \
-    mainwindow.h \
-    qcustomplot.h \
-    script.h \
-    utils.h \
-    driver.h \
-    tag.h \
-    ini.h \
-    config.h
+    src/mainwindow.h \
+    src/qcustomplot.h \
+    src/script.h \
+    src/utils.h \
+    src/driver.h \
+    src/tag.h \
+    src/ini.h \
+    src/config.h
 
-SOURCES += main.cpp \
-    mainwindow.cpp \
-    qcustomplot.cpp \
-    script.cpp \
-    utils.cpp \
-    driver.cpp \
-    tag.cpp \
-    config.cpp
+SOURCES += \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/qcustomplot.cpp \
+    src/script.cpp \
+    src/utils.cpp \
+    src/driver.cpp \
+    src/tag.cpp \
+    src/config.cpp
 
 FORMS += \
-    mainwindow.ui
+    src/mainwindow.ui
 
 contains(PLATFORM, arm) {
     INSTALLS += target
