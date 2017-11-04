@@ -150,6 +150,7 @@ void MainWindow::initScripts() {
         if (!executing) {
             ui->teLog->clear();
             displayStatus(Status_Ready);
+            ui->lCounter->setText("0");
         }
     });
 }
