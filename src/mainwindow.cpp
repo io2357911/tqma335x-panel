@@ -158,7 +158,8 @@ void MainWindow::initScripts() {
         if (!executing) {
             ui->teLog->clear();
             displayStatus(Status_Ready);
-            _plot->reset();
+            ui->lCounter->setText("0");
+	    _plot->reset();
         }
     });
 }
