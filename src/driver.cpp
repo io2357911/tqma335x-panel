@@ -1,6 +1,5 @@
 #include "driver.h"
 
-#include "mainwindow.h"
 
 Driver::Driver(QObject *parent) :
     QObject(parent) {

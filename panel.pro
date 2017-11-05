@@ -18,7 +18,9 @@ HEADERS += \
     src/driver.h \
     src/tag.h \
     src/ini.h \
-    src/config.h
+    src/config.h \
+    src/plot.h \
+    src/timer.h
 
 SOURCES += \
     src/main.cpp \
@@ -28,7 +30,9 @@ SOURCES += \
     src/utils.cpp \
     src/driver.cpp \
     src/tag.cpp \
-    src/config.cpp
+    src/config.cpp \
+    src/plot.cpp \
+    src/timer.cpp
 
 FORMS += \
     src/mainwindow.ui

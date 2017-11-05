@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
     initTags();
     initDriver();
     initScripts();
-    initGraph();
+    initPlot();
     initMisc();
 }
 
@@ -67,14 +67,16 @@ void MainWindow::initTags() {
         tagsTable->setItem(i, 2, item);
     }
 
-    _tagsRefreshTimer.setInterval(_config.commonTagsRefreshMs());
-    connect(&_tagsRefreshTimer, &QTimer::timeout, this, [this](){
+
+    QTimer *refreshTimer = new QTimer(this);
+    refreshTimer->setInterval(_config.commonTagsRefreshMs());
+    connect(refreshTimer, &QTimer::timeout, this, [this](){
         for (int i = 0; i < _tags.size(); i++) {
             Tag *tag = _tags[i];
             ui->twTags->item(i, 1)->setText(QString::number(tag->value()));
         }
     });
-    _tagsRefreshTimer.start();
+    refreshTimer->start();
 
     // индикация устройств
     QVector<Tag*> deviceTags = _tags.deviceTags();
@@ -94,6 +96,7 @@ void MainWindow::initTags() {
                     abortScriptExecuting()) {
                     qDebug("main: device failed - script stopped");
                     QMessageBox::warning(this, "Внимание", "Устройство не подключено или неисправно - скрипт остановлен");
+                    _plot->stop();
                 }
             }
         });
@@ -119,6 +122,7 @@ void MainWindow::initScripts() {
         connect(script, &Script::finished, this, [this](){
             updateButtons();
             Utils::writeTextFile(OUTPUT_FILE, ui->teLog->toPlainText());
+            _plot->stop();
         });
 
         QPushButton *button = new QPushButton(script->name(), this);
@@ -138,6 +142,8 @@ void MainWindow::initScripts() {
             displayStatus(Status_InProgress);
             ui->lCounter->setText("0");
 
+            _plot->start();
+
             script->execute();
         });
         ui->hlScripts->insertWidget(ui->hlScripts->count()-2, button);
@@ -147,33 +153,21 @@ void MainWindow::initScripts() {
     connect(ui->pbAbort, &QPushButton::clicked, this, [this](){
         bool executing = abortScriptExecuting();
 
+        _plot->stop();
+
         if (!executing) {
             ui->teLog->clear();
             displayStatus(Status_Ready);
+            _plot->reset();
         }
     });
 }
 
-void MainWindow::initGraph() {
-    QCustomPlot *plot = ui->wPlot;
-    plot->addGraph();
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, [this](){
-        QCustomPlot *plot = ui->wPlot;
-
-        int samplesCount = 50;
-        QVector<double> x(samplesCount), y(samplesCount);
-        for (int i = 0; i < samplesCount; i++) {
-            x[i] = i;
-            y[i] = randf(1, 5);
-        }
-        plot->graph()->setData(x, y, true);
-        plot->rescaleAxes();
-        plot->replot();
-    });
-    timer->setInterval(250);
-    timer->start();
+void MainWindow::initPlot() {
+    _plot = _config.plot();
+    _plot->setParent(this);
+    _plot->setTags(_tags);
+    _plot->setPlot(ui->wPlot);
 }
 
 void MainWindow::initMisc() {

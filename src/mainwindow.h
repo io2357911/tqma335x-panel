@@ -7,6 +7,7 @@
 #include "tag.h"
 #include "driver.h"
 #include "script.h"
+#include "plot.h"
 
 typedef QVector<QPushButton*> Buttons;
 
@@ -50,7 +51,7 @@ private:
     void initTags();
     void initDriver();
     void initScripts();
-    void initGraph();
+    void initPlot();
     void initMisc();
 
     bool isDevicesReady();
@@ -65,8 +66,7 @@ private:
     Tags            _tags;
     Driver          _driver;
     Scripts         _scripts;
-
-    QTimer          _tagsRefreshTimer;
+    Plot            *_plot;
 };
 
 #endif // MAINWINDOW_H

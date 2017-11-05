@@ -30,6 +30,14 @@ namespace Ini {
             int val = value.toInt(&ok);
             return ok ? val : defaultValue;
         }
+        int doubl(QString key, double defaultValue = 0) {
+            QVariant value = this->value(key);
+            if (!value.isValid()) return defaultValue;
+
+            bool ok;
+            int val = value.toDouble(&ok);
+            return ok ? val : defaultValue;
+        }
         QString string(QString key, QString defaultValue = QString()) {
             QVariant value = this->value(key);
             bool isValid = value.isValid() && value.type() == QVariant::String;

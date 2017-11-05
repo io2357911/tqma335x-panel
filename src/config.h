@@ -4,7 +4,7 @@
 #include <QHostAddress>
 #include <QVector>
 #include "script.h"
-
+#include "plot.h"
 
 class Config {
 public:
@@ -40,6 +40,11 @@ public:
     Scripts scripts() const;
     void setScripts(const Scripts &scripts);
 
+    // plot
+
+    Plot *plot() const;
+    void setPlot(Plot *plot);
+
 private:
     // driver
     QHostAddress    _driverIp               = QHostAddress("127.0.0.1");
@@ -54,6 +59,9 @@ private:
 
     // scripts
     Scripts         _scripts;
+
+    // plot
+    Plot            *_plot                  = 0;
 };
 
 #endif // CONFIG_H
