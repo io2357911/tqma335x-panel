@@ -6,7 +6,7 @@
 
 #define DEVICE_READY_VALUE  3
 
-#if defined(ARM)
+#ifdef __arm__
 #define CONFIG_FILE "/opt/config.ini"
 #define TAGS_FILE   "/opt/tags.efs"
 #define OUTPUT_FILE "/opt/script.log"

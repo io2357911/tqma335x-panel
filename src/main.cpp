@@ -5,7 +5,7 @@ int main(int argc, char **argv) {
     QApplication app(argc, argv);
 
     MainWindow window;
-#ifdef ARM
+#ifdef __arm__
     window.showFullScreen();
 #else
     window.show();
