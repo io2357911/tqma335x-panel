@@ -23,3 +23,4 @@ scripts/exps
 user_specs/*
 Output/*
 .qmake.stash
+doc/html

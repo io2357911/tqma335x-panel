@@ -15,6 +15,9 @@ namespace Ui {
 class MainWindow;
 }
 
+/**
+ * @brief The MainWindow class класс главного окна приложения
+ */
 class MainWindow :
     public QMainWindow,
     public IScriptActionHandler {

@@ -6,17 +6,34 @@
 #include <QTimer>
 #include "tag.h"
 
+/**
+ * @brief The Driver class класс драйвера для работы с контроллером
+ */
 class Driver : public QObject {
     Q_OBJECT
 public:
     Driver(QObject *parent = 0);
     ~Driver();
-
+    /**
+     * @brief start запускает драйвер
+     */
     void start();
+    /**
+     * @brief start останавливает драйвер
+     */
     void stop();
     bool isRunning();
 
+    /**
+     * @brief getTagsValues запрашивает теги у контроллера
+     */
     void getTagsValues();
+    /**
+     * @brief setTagValue устанавливает значение тега
+     * @param tags все теги (сожержит доп. информацию по тегам в целом)
+     * @param tag конкретный тег
+     * @param value значение
+     */
     void setTagValue(const Tags &tags, Tag *tag, int value);
 
     Tags tags() const;

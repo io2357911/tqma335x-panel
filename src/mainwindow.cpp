@@ -44,7 +44,12 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::initTags() {
+
+    // загрузка тегов
+
     _tags = Tags::load(TAGS_FILE);
+
+    // создание виджетов тегов
 
     QTableWidget *tagsTable = ui->twTags;
     tagsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -67,6 +72,7 @@ void MainWindow::initTags() {
         tagsTable->setItem(i, 2, item);
     }
 
+    // таймер обновления значений тегов
 
     QTimer *refreshTimer = new QTimer(this);
     refreshTimer->setInterval(_config.commonTagsRefreshMs());
@@ -79,6 +85,7 @@ void MainWindow::initTags() {
     refreshTimer->start();
 
     // индикация устройств
+
     QVector<Tag*> deviceTags = _tags.deviceTags();
     for (Tag *tag : deviceTags) {
         QLabel *label = new QLabel(tag->device(), this);
@@ -115,6 +122,7 @@ void MainWindow::initDriver() {
 
 void MainWindow::initScripts() {
     _scripts = _config.scripts();
+
     for (Script *script : _scripts) {
         script->setParent(this);
         script->setActionHandler(this);
@@ -124,6 +132,8 @@ void MainWindow::initScripts() {
             Utils::writeTextFile(OUTPUT_FILE, ui->teLog->toPlainText());
             _plot->stop();
         });
+
+        // кнопка запуска скрипта
 
         QPushButton *button = new QPushButton(script->name(), this);
         connect(button, &QPushButton::clicked, this, [this, script]() {
@@ -150,6 +160,8 @@ void MainWindow::initScripts() {
         _scriptsButton.append(button);
     }
 
+    // кнопка завершения работы скрипта
+
     connect(ui->pbAbort, &QPushButton::clicked, this, [this](){
         bool executing = abortScriptExecuting();
 
@@ -159,7 +171,7 @@ void MainWindow::initScripts() {
             ui->teLog->clear();
             displayStatus(Status_Ready);
             ui->lCounter->setText("0");
-	    _plot->reset();
+            _plot->reset();
         }
     });
 }

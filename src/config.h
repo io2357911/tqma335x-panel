@@ -6,8 +6,16 @@
 #include "script.h"
 #include "plot.h"
 
+/**
+ * @brief The Config class класс для работы с файлом конфигурации
+ */
 class Config {
 public:
+    /**
+     * @brief load загружает файл конфигурации
+     * @param fileName путь к файлу конфигурации
+     * @return объект конфигурации
+     */
     static Config load(QString fileName);
 
     // driver

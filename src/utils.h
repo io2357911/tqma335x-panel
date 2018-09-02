@@ -3,6 +3,9 @@
 
 #include <QString>
 
+/**
+ * @brief содержит вспомогательные функции
+ */
 namespace Utils {
 
 void sleepMs(int timeMs);

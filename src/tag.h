@@ -5,6 +5,9 @@
 #include <QVector>
 #include <mutex>
 
+/**
+ * @brief The Tag class класс тега контроллера
+ */
 class Tag : public QObject {
     Q_OBJECT
 public:
@@ -59,6 +62,9 @@ private:
     std::mutex  _valueMutex;
 };
 
+/**
+ * @brief The Tags class класс таблицы тегов контроллера
+ */
 class Tags : public QVector<Tag*> {
 public:
     static Tags load(QString fileName);

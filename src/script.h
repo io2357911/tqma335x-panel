@@ -11,7 +11,9 @@
 #define SCRIPT_ACTION_SET_COUNTER   "setCounter"
 #define SCRIPT_ACTION_FINISH        "finish"
 
-
+/**
+ * @brief The IScriptActionHandler class интерфейс обработчика операций скрипта
+ */
 class IScriptActionHandler {
 
 public:
@@ -23,15 +25,27 @@ public:
     virtual void finish(int code) = 0;
 };
 
-
+/**
+ * @brief The IScript class интерфейс скрипта
+ */
 class IScript {
 
 public:
     IScript();
     virtual ~IScript();
 
+    /**
+     * @brief execute начинает исполнение скрипта
+     */
     virtual void execute() = 0;
+    /**
+     * @brief abortExecuting завершает исполнение скрипта
+     */
     virtual void abortExecuting() = 0;
+    /**
+     * @brief isExecuting проверка исполнения скрипта
+     * @return true если исполняется
+     */
     virtual bool isExecuting() = 0;
 
     QString text() const;
@@ -45,7 +59,9 @@ protected:
     IScriptActionHandler    *_actionHandler;
 };
 
-
+/**
+ * @brief The BaseScript class класс скрипта на базе QtScript
+ */
 class BaseScript :
     public QScriptEngine,
     public IScript {
@@ -61,7 +77,9 @@ public:
     bool isExecuting();
 };
 
-
+/**
+ * @brief The Script class обертка для класса скрипта BaseScript для удобства управления
+ */
 class Script :
     public QObject,
     public IScript,
